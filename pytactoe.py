@@ -2,7 +2,7 @@ import curses
 import sys
 from curses import wrapper
 
-def main(stdscr):
+def debugUi(stdscr):
     stdscr.clear()
     curses.init_pair(1, curses.COLOR_RED, curses.COLOR_BLACK)
     for x in range(0, 10):
@@ -46,6 +46,42 @@ def main(stdscr):
             rows, cols = stdscr.getmaxyx()
             stdscr.addstr(rows, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
             stdscr.addstr(rows, 0, mykey)
+
+
+def main(stdscr):
+    stdscr.clear()
+    stdscr.nodelay(True)
+    origrows, origcols = stdscr.getmaxyx()
+    quit = False
+    title = 'PyTacToe'
+    curses.curs_set(False)
+    stdscr.addstr(1, int((origcols - len(title)) / 2), title)
+    stdscr.addstr(8, 10, '1) Play a game')
+    stdscr.addstr(9, 10, '2) Debugging interface')
+    stdscr.addstr(10,10, 'q) Quit' )
+
+    while quit == False:
+        try:
+            mykey = stdscr.getkey()
+        except curses.error:
+            #combine this with below, would wan other curses errors coming thorugh
+            pass
+        except:
+            type, value, traceback = sys.exc_info()
+            stdscr.addstr(30, 10, "{} {}".format(str(type), str(value)))
+        else:
+            if mykey == 'q':
+                quit = True
+                continue
+            elif mykey == '2':
+                debugUi(stdscr)
+            elif mykey == 'KEY_RESIZE':
+                #stdscr.addstr(31, 10, 'caught a resize')
+                #rows, cols = stdscr.getmaxyx()
+                #stdscr.resize(rows, cols)
+                #stdscr.addstr(40, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
+                continue
+                
 
 wrapper(main)
 
