@@ -9,9 +9,10 @@ def debugUi(stdscr):
         for y in range(0, 10):
             stdscr.addstr(10 + x, 10 + y, str(y), curses.color_pair(x))
         
-    
+    oldlen = 0
     stdscr.refresh()
     stdscr.nodelay(True)
+    curses.curs_set(True)
     origrows, origcols = stdscr.getmaxyx()
     quit = False
 
@@ -35,32 +36,50 @@ def debugUi(stdscr):
             if mykey == 'q':
                 quit = True
                 continue
-            elif mykey == 'KEY_RESIZE':
+            #elif mykey == 'KEY_RESIZE':
                 #stdscr.addstr(31, 10, 'caught a resize')
                 #rows, cols = stdscr.getmaxyx()
                 #stdscr.resize(rows, cols)
                 #stdscr.addstr(40, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
-                continue
+                #continue
                 
-
+            #try:
             rows, cols = stdscr.getmaxyx()
-            stdscr.addstr(rows, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
-            stdscr.addstr(rows, 0, mykey)
+            #try:
+            stdscr.addstr(rows - 1, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
+            #except:
+                #type, value, traceback = sys.exc_info()
+                #stdscr.addstr(30, 10, "{} {}".format(str(type), str(value)))
+            addin = ''
+            if len(mykey) < oldlen:
+                addin = ' ' * (oldlen - len(mykey))
+
+            stdscr.addstr(rows - 2, 10, mykey + addin)
+            oldlen = len(mykey)
+            #except curses.error:
+                #pass
+
 
 
 def main(stdscr):
-    stdscr.clear()
+    
     stdscr.nodelay(True)
     origrows, origcols = stdscr.getmaxyx()
     quit = False
+    drawScreen =  True
     title = 'PyTacToe'
     curses.curs_set(False)
-    stdscr.addstr(1, int((origcols - len(title)) / 2), title)
-    stdscr.addstr(8, 10, '1) Play a game')
-    stdscr.addstr(9, 10, '2) Debugging interface')
-    stdscr.addstr(10,10, 'q) Quit' )
+    
 
     while quit == False:
+        if drawScreen == True:
+            stdscr.clear()
+            stdscr.addstr(1, int((origcols - len(title)) / 2), title)
+            stdscr.addstr(8, 10, '1) Play a game')
+            stdscr.addstr(9, 10, '2) Debugging interface')
+            stdscr.addstr(10,10, 'q) Quit' )
+            drawScreen = False
+
         try:
             mykey = stdscr.getkey()
         except curses.error:
@@ -75,13 +94,15 @@ def main(stdscr):
                 continue
             elif mykey == '2':
                 debugUi(stdscr)
+                drawScreen = True
             elif mykey == 'KEY_RESIZE':
                 #stdscr.addstr(31, 10, 'caught a resize')
                 #rows, cols = stdscr.getmaxyx()
                 #stdscr.resize(rows, cols)
                 #stdscr.addstr(40, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
                 continue
-                
+            
+            #stdscr.addstr(30, 10, "f00")
 
 wrapper(main)
 
