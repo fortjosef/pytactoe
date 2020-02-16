@@ -1,6 +1,56 @@
 import curses
 import sys
+import math
 from curses import wrapper
+
+def game(stdscr):
+    stdscr.clear()
+    quit = False
+    drawScreen = True
+    playField = [
+        ['','','X'],
+        ['O','',''],
+        ['','','']
+    ]
+
+    while quit == False:
+        rows, cols = stdscr.getmaxyx()
+        playFieldXOrigin = math.floor((cols - 5) / 2)
+        playFieldYOrigin = 0
+
+        if drawScreen == True:
+            for y in range(0,5):
+                if y == 1 or y == 3:
+                    stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin, "-----")
+                else:
+                    for x in range(0,5):
+                        if x == 1 or x == 3:
+                            stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, "|")
+                        else:
+                            stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, playField[int(y / 2)][int(x / 2)])
+
+            drawScreen = False
+
+
+        
+        try:
+            mykey = stdscr.getkey()
+        except curses.error:
+            #combine this with below, would wan other curses errors coming thorugh
+            pass
+        except:
+            type, value, traceback = sys.exc_info()
+            stdscr.addstr(30, 10, "{} {}".format(str(type), str(value)))
+        else:
+            if mykey == 'q':
+                quit = True
+                continue
+            elif mykey == 'KEY_RESIZE':
+                #stdscr.addstr(31, 10, 'caught a resize')
+                #rows, cols = stdscr.getmaxyx()
+                #stdscr.resize(rows, cols)
+                #stdscr.addstr(40, 10, "{} Rows {} Columns".format(str(rows), str(cols)))
+                continue
 
 def debugUi(stdscr):
     stdscr.clear()
@@ -92,6 +142,9 @@ def main(stdscr):
             if mykey == 'q':
                 quit = True
                 continue
+            elif mykey == '1':
+                game(stdscr)
+                drawScreen = True
             elif mykey == '2':
                 debugUi(stdscr)
                 drawScreen = True
