@@ -7,12 +7,16 @@ def game(stdscr):
     stdscr.clear()
     quit = False
     drawScreen = True
+    curses.curs_set(True)
     playField = [
-        ['','','X'],
-        ['O','',''],
+        ['','',''],
+        ['','',''],
         ['','','']
     ]
+    cursorX = 0
+    cursorY = 0
 
+#KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN
     while quit == False:
         rows, cols = stdscr.getmaxyx()
         playFieldXOrigin = math.floor((cols - 5) / 2)
@@ -29,6 +33,7 @@ def game(stdscr):
                         else:
                             stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, playField[int(y / 2)][int(x / 2)])
 
+            stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
             drawScreen = False
 
 
@@ -45,6 +50,22 @@ def game(stdscr):
             if mykey == 'q':
                 quit = True
                 continue
+            elif mykey == 'KEY_UP':
+                if cursorY > 0:
+                    cursorY -= 1
+                    stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
+            elif mykey == 'KEY_DOWN':
+                if cursorY < 2:
+                    cursorY += 1
+                    stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
+            elif mykey == 'KEY_RIGHT':
+                if cursorX < 2:
+                    cursorX += 1
+                    stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
+            elif mykey == 'KEY_LEFT':
+                if cursorX > 0:
+                    cursorX -= 1
+                    stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
             elif mykey == 'KEY_RESIZE':
                 #stdscr.addstr(31, 10, 'caught a resize')
                 #rows, cols = stdscr.getmaxyx()
