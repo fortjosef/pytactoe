@@ -3,24 +3,38 @@ import sys
 import math
 from curses import wrapper
 
+def translatePlayer(playerAsInt):
+    if playerAsInt == -1:
+        return "X"
+    elif playerAsInt == 1:
+        return "Y"
+
+    return ""
+
 def game(stdscr):
     stdscr.clear()
     quit = False
     drawScreen = True
+    computerOpponent = False
     curses.curs_set(True)
     playField = [
-        ['','',''],
-        ['','',''],
-        ['','','']
+        [0,0,0],
+        [0,0,0],
+        [0,0,0]
     ]
     cursorX = 0
     cursorY = 0
+    currentPlayer = -1
+    stdscr.addstr(0, 0, "Arrow Keys to move, Return to place piece")
+    stdscr.addstr(1, 0, "Q to quit")
 
 #KEY_LEFT, KEY_UP, KEY_RIGHT, KEY_DOWN
     while quit == False:
         rows, cols = stdscr.getmaxyx()
         playFieldXOrigin = math.floor((cols - 5) / 2)
-        playFieldYOrigin = 0
+        playFieldYOrigin = 5
+        stdscr.addstr(2, 0, translatePlayer(currentPlayer) + " to move")
+        stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
 
         if drawScreen == True:
             for y in range(0,5):
@@ -31,7 +45,7 @@ def game(stdscr):
                         if x == 1 or x == 3:
                             stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, "|")
                         else:
-                            stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, playField[int(y / 2)][int(x / 2)])
+                            stdscr.addstr(playFieldYOrigin + y, playFieldXOrigin + x, translatePlayer(playField[int(y / 2)][int(x / 2)]))
 
             stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
             drawScreen = False
@@ -66,6 +80,16 @@ def game(stdscr):
                 if cursorX > 0:
                     cursorX -= 1
                     stdscr.move(playFieldYOrigin + (cursorY * 2), playFieldXOrigin + (cursorX * 2))
+            elif mykey == '\n':
+                if playField[cursorY][cursorX] == 0:
+                    playField[cursorY][cursorX] = currentPlayer
+                    drawScreen = True
+                    if currentPlayer == -1:
+                        currentPlayer = 1
+                    else:
+                        currentPlayer = -1
+                else:
+                    curses.beep()
             elif mykey == 'KEY_RESIZE':
                 #stdscr.addstr(31, 10, 'caught a resize')
                 #rows, cols = stdscr.getmaxyx()
