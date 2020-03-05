@@ -11,6 +11,52 @@ def translatePlayer(playerAsInt):
 
     return ""
 
+def checkForWin(playField):
+    #amount of possible solutions amtRows + amountCols + 2
+    rowTotals = [0 for x in range(3)]
+    colTotals = [0 for x in range(3)]
+    diagTotals = [0, 0]
+
+    for y in range(3):
+        for x in range(3):
+            rowTotals[y] += playField[y][x]
+            colTotals[x] += playField[y][x]
+            if x == y:
+                diagTotals[0] += playField[y][x]
+            
+            if x + y == 2:
+                diagTotals[1] += playField[y][x]
+
+    #not doing early returns because when i add shifting there will be the posibility of having both an X and Y win or even more
+    winsForX = 0
+    winsForY = 0
+
+    for x in range(3):
+        if rowTotals[x] == -3:
+            winsForX += 1
+        if colTotals[x] == -3:
+            winsForX += 1
+        if rowTotals[x] == 3:
+            winsForY += 1
+        if colTotals[x] == 3:
+            winsForY += 1
+        if x < 2:
+            if diagTotals[x] == -3:
+                winsForX += 1
+            if diagTotals[x] == 3:
+                winsForY += 1
+    
+    if winsForX == winsForY:
+        if winsForX > 0:
+            return 2 #draw
+        else:
+            return 0 #no win
+    
+    if winsForX > winsForY:
+        return -1
+    else:
+        return 1
+
 def game(stdscr):
     stdscr.clear()
     quit = False
@@ -84,10 +130,18 @@ def game(stdscr):
                 if playField[cursorY][cursorX] == 0:
                     playField[cursorY][cursorX] = currentPlayer
                     drawScreen = True
-                    if currentPlayer == -1:
-                        currentPlayer = 1
-                    else:
-                        currentPlayer = -1
+                    winResult = checkForWin(playField)
+                    stdscr.addstr(10, 0, str(winResult))
+
+                    if winResult != 0:
+                        #will need to add handling for a draw
+                        #will also need to add handling for a cat
+                        stdscr.addstr(0, 0, translatePlayer(winResult) + " WINS!!!")
+                    else:   
+                        if currentPlayer == -1:
+                            currentPlayer = 1
+                        else:
+                            currentPlayer = -1
                 else:
                     curses.beep()
             elif mykey == 'KEY_RESIZE':
